@@ -4,625 +4,181 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Prompter</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0a;
-    --text: #e8e4dc;
-    --text-dim: #6b6660;
-    --accent: #ff6b35;
-    --accent-glow: rgba(255, 107, 53, 0.15);
-    --surface: #161614;
-    --surface-hover: #1e1e1b;
-    --border: #2a2926;
-    --reading-line: rgba(255, 107, 53, 0.08);
+    --bg: #0d0d12;
+    --bg-card: #16161e;
+    --bg-elevated: #1e1e2a;
+    --text: #f0ede6;
+    --text-dim: #7a7885;
+    --text-muted: #4a4856;
+    --accent: #6c5ce7;
+    --accent-light: #a29bfe;
+    --accent-glow: rgba(108, 92, 231, 0.2);
+    --hot: #fd7272;
+    --hot-glow: rgba(253, 114, 114, 0.15);
+    --mint: #00cec9;
+    --border: #2d2b3a;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Noto Sans KR', 'Outfit', sans-serif;
     overflow: hidden;
     height: 100dvh;
     width: 100vw;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-
-  /* ===== EDIT MODE ===== */
   #edit-screen {
     display: flex;
     flex-direction: column;
     height: 100dvh;
-    padding: 24px;
-    gap: 20px;
+    padding: 28px;
+    gap: 24px;
+    background: radial-gradient(ellipse at 20% 0%, rgba(108,92,231,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(253,114,114,0.05) 0%, transparent 50%), var(--bg);
   }
-
   #edit-screen.hidden { display: none; }
-
-  .edit-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-
+  .edit-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .logo-group { display: flex; flex-direction: column; gap: 2px; }
   .logo {
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    font-size: 22px;
-    letter-spacing: -0.5px;
-    color: var(--accent);
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--hot) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-
-  .logo span {
-    color: var(--text-dim);
-    font-weight: 400;
-    font-size: 13px;
-    margin-left: 10px;
-    letter-spacing: 0;
-  }
-
+  .logo-sub { font-family: 'Outfit', sans-serif; font-weight: 400; font-size: 11px; color: var(--text-dim); letter-spacing: 3px; text-transform: uppercase; }
   .btn-start {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    padding: 12px 32px;
-    border-radius: 100px;
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: -0.3px;
+    background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%); color: #fff; border: none;
+    padding: 14px 36px; border-radius: 12px; font-size: 15px; font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 24px rgba(108,92,231,0.35);
   }
-
-  .btn-start:active { transform: scale(0.96); opacity: 0.9; }
-
+  .btn-start:active { transform: scale(0.96); }
   #script-input {
-    flex: 1;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    color: var(--text);
-    font-size: 18px;
-    font-family: 'Noto Sans KR', sans-serif;
-    line-height: 1.9;
-    resize: none;
-    outline: none;
-    transition: border-color 0.2s;
+    flex: 1; background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 16px;
+    padding: 24px; color: var(--text); font-size: 17px; font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300; line-height: 2; resize: none; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
   }
-
-  #script-input:focus { border-color: var(--accent); }
-
-  #script-input::placeholder { color: var(--text-dim); }
-
-  .edit-footer {
-    display: flex;
-    gap: 12px;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-  }
-
+  #script-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+  #script-input::placeholder { color: var(--text-muted); }
+  .edit-footer { display: flex; gap: 10px; flex-shrink: 0; }
   .preset-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 8px 16px;
-    border-radius: 100px;
-    font-size: 13px;
-    font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s;
+    background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 10px 18px; border-radius: 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer; transition: all 0.2s;
   }
-
-  .preset-btn:active { background: var(--surface-hover); color: var(--text); }
-
-  /* ===== PROMPTER MODE ===== */
-  #prompter-screen {
-    display: none;
-    flex-direction: column;
-    height: 100dvh;
-    position: relative;
-  }
-
+  .preset-btn:active { background: var(--border); color: var(--text); }
+  #prompter-screen { display: none; flex-direction: column; height: 100dvh; position: relative; background: var(--bg); }
   #prompter-screen.active { display: flex; }
-
-  /* Reading guide line */
   .reading-guide {
-    position: fixed;
-    top: 30%;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--accent);
-    opacity: 0.5;
-    z-index: 10;
-    pointer-events: none;
-    box-shadow: 0 0 30px var(--accent), 0 0 60px rgba(255, 107, 53, 0.2);
+    position: fixed; top: 30%; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent-light) 30%, var(--accent-light) 70%, transparent 100%);
+    opacity: 0.6; z-index: 10; pointer-events: none;
+    box-shadow: 0 0 20px var(--accent-light), 0 0 60px var(--accent-glow);
   }
-
-  /* Fade masks */
-  .fade-top, .fade-bottom {
-    position: fixed;
-    left: 0;
-    right: 0;
-    height: 25%;
-    z-index: 5;
-    pointer-events: none;
-  }
-
-  .fade-top {
-    top: 0;
-    background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
-  }
-
-  .fade-bottom {
-    bottom: 80px;
-    background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
-  }
-
-  /* Script content */
-  #script-display {
-    flex: 1;
-    overflow: hidden;
-    padding: 0 48px;
-    position: relative;
-  }
-
+  .fade-top, .fade-bottom { position: fixed; left: 0; right: 0; z-index: 5; pointer-events: none; }
+  .fade-top { top: 0; height: 28%; background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%); }
+  .fade-bottom { bottom: 76px; height: 25%; background: linear-gradient(to top, var(--bg) 0%, transparent 100%); }
+  #script-display { flex: 1; overflow: hidden; padding: 0 48px; position: relative; }
   #script-content {
-    position: absolute;
-    left: 48px;
-    right: 48px;
-    top: 30%;
-    font-size: 36px;
-    line-height: 2;
-    font-weight: 400;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: keep-all;
-    transition: top 0.05s linear;
-    padding-bottom: 70vh;
+    position: absolute; left: 48px; right: 48px; top: 30%; font-size: 36px; line-height: 2;
+    font-weight: 300; color: var(--text); white-space: pre-wrap; word-break: keep-all;
+    transition: top 0.05s linear; padding-bottom: 70vh;
   }
-
-  /* Control bar */
-  .control-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, var(--bg) 60%, transparent);
-    padding: 16px 24px 28px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    z-index: 20;
-  }
-
-  .ctrl-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-
-  .ctrl-btn:active { transform: scale(0.9); }
-
-  .btn-play {
-    background: var(--accent);
-    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
-  }
-
-  .btn-play svg { fill: #fff; width: 22px; height: 22px; }
-
-  .btn-secondary {
-    background: var(--surface);
-    border: 1px solid var(--border) !important;
-  }
-
-  .btn-secondary svg { fill: var(--text-dim); width: 20px; height: 20px; }
-
-  /* Slider group */
-  .slider-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .slider-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .slider-label {
-    font-size: 11px;
-    color: var(--text-dim);
-    width: 32px;
-    text-align: right;
-    font-family: 'IBM Plex Sans', sans-serif;
-    flex-shrink: 0;
-  }
-
-  .slider-value {
-    font-size: 12px;
-    color: var(--accent);
-    width: 36px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-
-  input[type="range"] {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    outline: none;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
-  }
-
-  /* Status indicator */
-  .status-pill {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 30;
-    padding: 6px 14px;
-    border-radius: 100px;
-    font-size: 12px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.3s;
-  }
-
-  .status-pill.playing {
-    background: rgba(255, 107, 53, 0.15);
-    color: var(--accent);
-  }
-
-  .status-pill.paused {
-    background: var(--surface);
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-  }
-
-  /* Progress bar */
-  .progress-track {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--surface);
-    z-index: 30;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    width: 0%;
-    transition: width 0.3s;
-  }
-
-  /* Mirror mode */
-  #script-display.mirrored #script-content {
-    transform: scaleX(-1);
-  }
-
+  #script-display.mirrored #script-content { transform: scaleX(-1); }
   .mirror-indicator {
-    position: fixed;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    padding: 5px 12px;
-    border-radius: 100px;
-    font-size: 11px;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-weight: 600;
-    background: rgba(255, 107, 53, 0.15);
-    color: var(--accent);
-    display: none;
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 30;
+    padding: 5px 14px; border-radius: 8px; font-size: 11px; font-family: 'Outfit', sans-serif;
+    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    background: var(--hot-glow); color: var(--hot); border: 1px solid rgba(253,114,114,0.2); display: none;
   }
-
   .mirror-indicator.active { display: block; }
-
-  /* Keyboard shortcut hint */
-  .hint {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 30;
-    font-size: 11px;
-    color: var(--text-dim);
-    font-family: 'IBM Plex Sans', sans-serif;
-    opacity: 0.6;
+  .control-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    padding: 12px 20px 28px; display: flex; align-items: center; gap: 12px; z-index: 20;
   }
+  .ctrl-btn {
+    width: 48px; height: 48px; border-radius: 12px; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+  }
+  .ctrl-btn:active { transform: scale(0.9); }
+  .btn-play { background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%); box-shadow: 0 4px 20px rgba(108,92,231,0.4); }
+  .btn-play svg { fill: #fff; width: 22px; height: 22px; }
+  .btn-secondary { background: var(--bg-elevated); border: 1px solid var(--border) !important; }
+  .btn-secondary svg { fill: var(--text-dim); width: 18px; height: 18px; }
+  .slider-group {
+    flex: 1; display: flex; flex-direction: column; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px;
+  }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  .slider-label { font-size: 10px; color: var(--text-muted); width: 28px; text-align: right; font-family: 'Outfit', sans-serif; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; flex-shrink: 0; }
+  .slider-value { font-size: 13px; color: var(--accent-light); width: 32px; font-family: 'Outfit', sans-serif; font-weight: 700; flex-shrink: 0; text-align: center; }
+  input[type="range"] { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; background: var(--border); border-radius: 2px; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-light); cursor: pointer; box-shadow: 0 2px 10px rgba(162,155,254,0.4); }
+  .status-pill { position: fixed; top: 16px; right: 16px; z-index: 30; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-family: 'Outfit', sans-serif; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; }
+  .status-pill.playing { background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(162,155,254,0.2); }
+  .status-pill.paused { background: var(--bg-elevated); color: var(--text-dim); border: 1px solid var(--border); }
+  .progress-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--bg-elevated); z-index: 30; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%); width: 0%; transition: width 0.3s; border-radius: 0 2px 2px 0; }
+  .hint { position: fixed; top: 16px; left: 16px; z-index: 30; font-size: 11px; color: var(--text-muted); font-family: 'Outfit', sans-serif; font-weight: 400; opacity: 0.8; }
 </style>
 </head>
 <body>
-
-<!-- EDIT SCREEN -->
 <div id="edit-screen">
   <div class="edit-header">
-    <div class="logo">Prompter <span>텔레프롬프터</span></div>
+    <div class="logo-group"><div class="logo">Prompter</div><div class="logo-sub">teleprompter</div></div>
     <button class="btn-start" onclick="startPrompter()">촬영 시작</button>
   </div>
   <textarea id="script-input" placeholder="여기에 대본을 붙여넣으세요.&#10;&#10;노션에서 복사한 텍스트를 그대로 Ctrl+V 하면 됩니다.&#10;&#10;빈 줄은 구분선으로 표시됩니다."></textarea>
   <div class="edit-footer">
-    <button class="preset-btn" onclick="loadSample()">샘플 대본 불러오기</button>
+    <button class="preset-btn" onclick="loadSample()">샘플 대본</button>
     <button class="preset-btn" onclick="document.getElementById('script-input').value=''; document.getElementById('script-input').focus();">초기화</button>
   </div>
 </div>
-
-<!-- PROMPTER SCREEN -->
 <div id="prompter-screen">
   <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
-  <div class="hint" id="hint-text">탭하여 재생/정지</div>
-  <div class="status-pill paused" id="status">정지</div>
-  <div class="mirror-indicator" id="mirror-badge">거울 모드</div>
+  <div class="hint" id="hint-text">tap to play / pause</div>
+  <div class="status-pill paused" id="status">paused</div>
+  <div class="mirror-indicator" id="mirror-badge">mirror</div>
   <div class="reading-guide"></div>
   <div class="fade-top"></div>
-  <div id="script-display">
-    <div id="script-content"></div>
-  </div>
+  <div id="script-display"><div id="script-content"></div></div>
   <div class="fade-bottom"></div>
-
   <div class="control-bar">
-    <!-- Back button -->
-    <button class="ctrl-btn btn-secondary" onclick="backToEdit()" title="편집으로 돌아가기">
-      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    </button>
-
-    <!-- Play/Pause -->
-    <button class="ctrl-btn btn-play" id="play-btn" onclick="togglePlay()">
-      <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      <svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-    </button>
-
-    <!-- Reset -->
-    <button class="ctrl-btn btn-secondary" onclick="resetScroll()" title="처음으로">
-      <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-    </button>
-
-    <!-- Mirror -->
-    <button class="ctrl-btn btn-secondary" id="mirror-btn" onclick="toggleMirror()" title="거울 모드">
-      <svg viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg>
-    </button>
-
-    <!-- Sliders -->
+    <button class="ctrl-btn btn-secondary" onclick="backToEdit()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <button class="ctrl-btn btn-play" id="play-btn" onclick="togglePlay()"><svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+    <button class="ctrl-btn btn-secondary" onclick="resetScroll()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+    <button class="ctrl-btn btn-secondary" id="mirror-btn" onclick="toggleMirror()"><svg viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg></button>
     <div class="slider-group">
-      <div class="slider-row">
-        <span class="slider-label">속도</span>
-        <input type="range" id="speed-slider" min="1" max="100" value="30" oninput="updateSpeed(this.value)">
-        <span class="slider-value" id="speed-val">30</span>
-      </div>
-      <div class="slider-row">
-        <span class="slider-label">크기</span>
-        <input type="range" id="size-slider" min="24" max="72" value="36" oninput="updateSize(this.value)">
-        <span class="slider-value" id="size-val">36</span>
-      </div>
+      <div class="slider-row"><span class="slider-label">spd</span><input type="range" id="speed-slider" min="1" max="100" value="30" oninput="updateSpeed(this.value)"><span class="slider-value" id="speed-val">30</span></div>
+      <div class="slider-row"><span class="slider-label">size</span><input type="range" id="size-slider" min="24" max="72" value="36" oninput="updateSize(this.value)"><span class="slider-value" id="size-val">36</span></div>
     </div>
   </div>
 </div>
-
 <script>
-  let isPlaying = false;
-  let scrollSpeed = 30;
-  let currentPos = 0;
-  let animationId = null;
-  let lastTimestamp = null;
-  let isMirrored = false;
-
-  function toggleMirror() {
-    isMirrored = !isMirrored;
-    const display = document.getElementById('script-display');
-    const badge = document.getElementById('mirror-badge');
-    const btn = document.getElementById('mirror-btn');
-    
-    if (isMirrored) {
-      display.classList.add('mirrored');
-      badge.classList.add('active');
-      btn.style.background = 'var(--accent)';
-      btn.querySelector('svg').style.fill = '#fff';
-    } else {
-      display.classList.remove('mirrored');
-      badge.classList.remove('active');
-      btn.style.background = 'var(--surface)';
-      btn.querySelector('svg').style.fill = 'var(--text-dim)';
-    }
-  }
-
-  function startPrompter() {
-    const text = document.getElementById('script-input').value.trim();
-    if (!text) {
-      document.getElementById('script-input').focus();
-      return;
-    }
-
-    document.getElementById('script-content').textContent = text;
-    document.getElementById('edit-screen').classList.add('hidden');
-    document.getElementById('prompter-screen').classList.add('active');
-    
-    currentPos = 0;
-    document.getElementById('script-content').style.top = '30%';
-    updateProgress();
-
-    // Hide hint after 3s
-    setTimeout(() => {
-      document.getElementById('hint-text').style.opacity = '0';
-    }, 3000);
-  }
-
-  function backToEdit() {
-    stopScroll();
-    document.getElementById('edit-screen').classList.remove('hidden');
-    document.getElementById('prompter-screen').classList.remove('active');
-    document.getElementById('hint-text').style.opacity = '0.6';
-  }
-
-  function togglePlay() {
-    if (isPlaying) {
-      stopScroll();
-    } else {
-      startScroll();
-    }
-  }
-
-  function startScroll() {
-    isPlaying = true;
-    lastTimestamp = null;
-    document.getElementById('icon-play').style.display = 'none';
-    document.getElementById('icon-pause').style.display = 'block';
-    document.getElementById('status').className = 'status-pill playing';
-    document.getElementById('status').textContent = '재생중';
-    animationId = requestAnimationFrame(scrollStep);
-  }
-
-  function stopScroll() {
-    isPlaying = false;
-    document.getElementById('icon-play').style.display = 'block';
-    document.getElementById('icon-pause').style.display = 'none';
-    document.getElementById('status').className = 'status-pill paused';
-    document.getElementById('status').textContent = '정지';
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-      animationId = null;
-    }
-    lastTimestamp = null;
-  }
-
-  function scrollStep(timestamp) {
-    if (!isPlaying) return;
-
-    if (lastTimestamp === null) {
-      lastTimestamp = timestamp;
-    }
-
-    const delta = timestamp - lastTimestamp;
-    lastTimestamp = timestamp;
-
-    // Speed: pixels per second (1~100 maps to 10~200 px/s)
-    const pxPerSecond = 10 + (scrollSpeed - 1) * (190 / 99);
-    const movement = (pxPerSecond * delta) / 1000;
-
-    currentPos += movement;
-
-    const content = document.getElementById('script-content');
-    const maxScroll = content.scrollHeight - window.innerHeight * 0.3;
-
-    if (currentPos >= maxScroll) {
-      currentPos = maxScroll;
-      stopScroll();
-    }
-
-    content.style.top = `calc(30% - ${currentPos}px)`;
-    updateProgress();
-
-    animationId = requestAnimationFrame(scrollStep);
-  }
-
-  function resetScroll() {
-    stopScroll();
-    currentPos = 0;
-    document.getElementById('script-content').style.top = '30%';
-    updateProgress();
-  }
-
-  function updateSpeed(val) {
-    scrollSpeed = parseInt(val);
-    document.getElementById('speed-val').textContent = val;
-  }
-
-  function updateSize(val) {
-    document.getElementById('script-content').style.fontSize = val + 'px';
-    document.getElementById('size-val').textContent = val;
-  }
-
-  function updateProgress() {
-    const content = document.getElementById('script-content');
-    const maxScroll = content.scrollHeight - window.innerHeight * 0.3;
-    const pct = maxScroll > 0 ? Math.min((currentPos / maxScroll) * 100, 100) : 0;
-    document.getElementById('progress').style.width = pct + '%';
-  }
-
-  // Tap to play/pause on the script area
-  document.getElementById('script-display').addEventListener('click', function(e) {
-    togglePlay();
-  });
-
-  // Keyboard controls
-  document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'TEXTAREA') return;
-
-    if (e.code === 'Space') {
-      e.preventDefault();
-      togglePlay();
-    } else if (e.code === 'ArrowUp') {
-      e.preventDefault();
-      const slider = document.getElementById('speed-slider');
-      slider.value = Math.min(parseInt(slider.value) + 5, 100);
-      updateSpeed(slider.value);
-    } else if (e.code === 'ArrowDown') {
-      e.preventDefault();
-      const slider = document.getElementById('speed-slider');
-      slider.value = Math.max(parseInt(slider.value) - 5, 1);
-      updateSpeed(slider.value);
-    } else if (e.code === 'KeyR') {
-      resetScroll();
-    } else if (e.code === 'KeyM') {
-      toggleMirror();
-    } else if (e.code === 'Escape') {
-      backToEdit();
-    }
-  });
-
-  // Prevent scrolling on iOS
-  document.body.addEventListener('touchmove', function(e) {
-    if (document.getElementById('prompter-screen').classList.contains('active')) {
-      e.preventDefault();
-    }
-  }, { passive: false });
-
-  function loadSample() {
-    document.getElementById('script-input').value = `안녕하세요 여러분, 오늘은 밴드 소셜 광고 성과를 분석해보겠습니다.
-
-먼저 3월 한 달간의 전체 캠페인 성과를 살펴보면, 총 6개 캠페인에서 약 1,500만 원의 광고비를 집행했습니다.
-
-전체 노출수는 약 3,200만 회, 가입 전환율은 평균 1.69%를 기록했는데요.
-
-캠페인별로 보면 산지농수산이 가장 높은 전환율을 보였고, 우리동네농산물은 CPA가 가장 낮아 효율이 좋았습니다.
-
-다음 영상에서는 각 캠페인의 소재별 성과를 더 자세히 분석해보겠습니다.
-
-구독과 좋아요 부탁드립니다. 감사합니다!`;
-  }
+let isPlaying=false,scrollSpeed=30,currentPos=0,animationId=null,lastTimestamp=null,isMirrored=false;
+function toggleMirror(){isMirrored=!isMirrored;const d=document.getElementById('script-display'),b=document.getElementById('mirror-badge'),t=document.getElementById('mirror-btn');if(isMirrored){d.classList.add('mirrored');b.classList.add('active');t.style.background='linear-gradient(135deg, var(--hot) 0%, #e17055 100%)';t.style.borderColor='transparent';t.querySelector('svg').style.fill='#fff'}else{d.classList.remove('mirrored');b.classList.remove('active');t.style.background='var(--bg-elevated)';t.style.borderColor='var(--border)';t.querySelector('svg').style.fill='var(--text-dim)'}}
+function startPrompter(){const t=document.getElementById('script-input').value.trim();if(!t){document.getElementById('script-input').focus();return}document.getElementById('script-content').textContent=t;document.getElementById('edit-screen').classList.add('hidden');document.getElementById('prompter-screen').classList.add('active');currentPos=0;document.getElementById('script-content').style.top='30%';updateProgress();setTimeout(()=>{document.getElementById('hint-text').style.opacity='0'},3000)}
+function backToEdit(){stopScroll();document.getElementById('edit-screen').classList.remove('hidden');document.getElementById('prompter-screen').classList.remove('active');document.getElementById('hint-text').style.opacity='0.8'}
+function togglePlay(){isPlaying?stopScroll():startScroll()}
+function startScroll(){isPlaying=true;lastTimestamp=null;document.getElementById('icon-play').style.display='none';document.getElementById('icon-pause').style.display='block';document.getElementById('status').className='status-pill playing';document.getElementById('status').textContent='playing';animationId=requestAnimationFrame(scrollStep)}
+function stopScroll(){isPlaying=false;document.getElementById('icon-play').style.display='block';document.getElementById('icon-pause').style.display='none';document.getElementById('status').className='status-pill paused';document.getElementById('status').textContent='paused';if(animationId){cancelAnimationFrame(animationId);animationId=null}lastTimestamp=null}
+function scrollStep(ts){if(!isPlaying)return;if(lastTimestamp===null)lastTimestamp=ts;const d=ts-lastTimestamp;lastTimestamp=ts;const px=10+(scrollSpeed-1)*(190/99);currentPos+=(px*d)/1000;const c=document.getElementById('script-content'),mx=c.scrollHeight-window.innerHeight*0.3;if(currentPos>=mx){currentPos=mx;stopScroll()}c.style.top=`calc(30% - ${currentPos}px)`;updateProgress();animationId=requestAnimationFrame(scrollStep)}
+function resetScroll(){stopScroll();currentPos=0;document.getElementById('script-content').style.top='30%';updateProgress()}
+function updateSpeed(v){scrollSpeed=parseInt(v);document.getElementById('speed-val').textContent=v}
+function updateSize(v){document.getElementById('script-content').style.fontSize=v+'px';document.getElementById('size-val').textContent=v}
+function updateProgress(){const c=document.getElementById('script-content'),mx=c.scrollHeight-window.innerHeight*0.3,p=mx>0?Math.min((currentPos/mx)*100,100):0;document.getElementById('progress').style.width=p+'%'}
+document.getElementById('script-display').addEventListener('click',function(){togglePlay()});
+document.addEventListener('keydown',function(e){if(e.target.tagName==='TEXTAREA')return;if(e.code==='Space'){e.preventDefault();togglePlay()}else if(e.code==='ArrowUp'){e.preventDefault();const s=document.getElementById('speed-slider');s.value=Math.min(parseInt(s.value)+5,100);updateSpeed(s.value)}else if(e.code==='ArrowDown'){e.preventDefault();const s=document.getElementById('speed-slider');s.value=Math.max(parseInt(s.value)-5,1);updateSpeed(s.value)}else if(e.code==='KeyR'){resetScroll()}else if(e.code==='KeyM'){toggleMirror()}else if(e.code==='Escape'){backToEdit()}});
+document.body.addEventListener('touchmove',function(e){if(document.getElementById('prompter-screen').classList.contains('active'))e.preventDefault()},{passive:false});
+function loadSample(){document.getElementById('script-input').value=`안녕하세요 여러분, 오늘은 밴드 소셜 광고 성과를 분석해보겠습니다.\n\n먼저 3월 한 달간의 전체 캠페인 성과를 살펴보면, 총 6개 캠페인에서 약 1,500만 원의 광고비를 집행했습니다.\n\n전체 노출수는 약 3,200만 회, 가입 전환율은 평균 1.69%를 기록했는데요.\n\n캠페인별로 보면 산지농수산이 가장 높은 전환율을 보였고, 우리동네농산물은 CPA가 가장 낮아 효율이 좋았습니다.\n\n다음 영상에서는 각 캠페인의 소재별 성과를 더 자세히 분석해보겠습니다.\n\n구독과 좋아요 부탁드립니다. 감사합니다!`}
 </script>
-
 </body>
 </html>
