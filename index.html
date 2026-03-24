@@ -20,26 +20,19 @@
     --accent-glow: rgba(108, 92, 231, 0.2);
     --hot: #fd7272;
     --hot-glow: rgba(253, 114, 114, 0.15);
-    --mint: #00cec9;
     --border: #2d2b3a;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     font-family: 'Noto Sans KR', 'Outfit', sans-serif;
-    overflow: hidden;
-    height: 100dvh;
-    width: 100vw;
-    touch-action: manipulation;
+    overflow: hidden; height: 100dvh; width: 100vw;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* EDIT SCREEN */
   #edit-screen {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-    padding: 28px;
-    gap: 24px;
+    display: flex; flex-direction: column; height: 100dvh; padding: 28px; gap: 24px;
     background: radial-gradient(ellipse at 20% 0%, rgba(108,92,231,0.08) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 100%, rgba(253,114,114,0.05) 0%, transparent 50%), var(--bg);
   }
@@ -63,6 +56,7 @@
     flex: 1; background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 16px;
     padding: 24px; color: var(--text); font-size: 17px; font-family: 'Noto Sans KR', sans-serif;
     font-weight: 300; line-height: 2; resize: none; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+    touch-action: auto;
   }
   #script-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
   #script-input::placeholder { color: var(--text-muted); }
@@ -73,6 +67,8 @@
     cursor: pointer; transition: all 0.2s;
   }
   .preset-btn:active { background: var(--border); color: var(--text); }
+
+  /* PROMPTER SCREEN */
   #prompter-screen { display: none; flex-direction: column; height: 100dvh; position: relative; background: var(--bg); }
   #prompter-screen.active { display: flex; }
   .reading-guide {
@@ -83,7 +79,7 @@
   }
   .fade-top, .fade-bottom { position: fixed; left: 0; right: 0; z-index: 5; pointer-events: none; }
   .fade-top { top: 0; height: 28%; background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%); }
-  .fade-bottom { bottom: 76px; height: 25%; background: linear-gradient(to top, var(--bg) 0%, transparent 100%); }
+  .fade-bottom { bottom: 0; height: 20%; background: linear-gradient(to top, var(--bg) 0%, transparent 100%); }
   #script-display { flex: 1; overflow: hidden; padding: 0 48px; position: relative; }
   #script-content {
     position: absolute; left: 48px; right: 48px; top: 30%; font-size: 36px; line-height: 2;
@@ -98,11 +94,16 @@
     background: var(--hot-glow); color: var(--hot); border: 1px solid rgba(253,114,114,0.2); display: none;
   }
   .mirror-indicator.active { display: block; }
+
+  /* CONTROL BAR - auto hide */
   .control-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    background: linear-gradient(to top, var(--bg) 80%, transparent);
     padding: 12px 20px 28px; display: flex; align-items: center; gap: 12px; z-index: 20;
+    transition: opacity 0.4s, transform 0.4s;
+    touch-action: auto;
   }
+  .control-bar.autohide { opacity: 0; transform: translateY(20px); pointer-events: none; }
   .ctrl-btn {
     width: 48px; height: 48px; border-radius: 12px; border: none;
     display: flex; align-items: center; justify-content: center;
@@ -116,18 +117,33 @@
   .slider-group {
     flex: 1; display: flex; flex-direction: column; gap: 8px;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px;
+    touch-action: auto;
   }
   .slider-row { display: flex; align-items: center; gap: 10px; }
   .slider-label { font-size: 10px; color: var(--text-muted); width: 28px; text-align: right; font-family: 'Outfit', sans-serif; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; flex-shrink: 0; }
   .slider-value { font-size: 13px; color: var(--accent-light); width: 32px; font-family: 'Outfit', sans-serif; font-weight: 700; flex-shrink: 0; text-align: center; }
-  input[type="range"] { flex: 1; -webkit-appearance: none; appearance: none; height: 4px; background: var(--border); border-radius: 2px; outline: none; }
-  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-light); cursor: pointer; box-shadow: 0 2px 10px rgba(162,155,254,0.4); }
-  .status-pill { position: fixed; top: 16px; right: 16px; z-index: 30; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-family: 'Outfit', sans-serif; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; }
+  input[type="range"] { flex: 1; -webkit-appearance: none; appearance: none; height: 6px; background: var(--border); border-radius: 3px; outline: none; touch-action: auto; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-light); cursor: pointer; box-shadow: 0 2px 10px rgba(162,155,254,0.4); }
+
+  /* Status & progress - auto hide */
+  .status-pill {
+    position: fixed; top: 16px; right: 16px; z-index: 30; padding: 6px 14px; border-radius: 8px;
+    font-size: 11px; font-family: 'Outfit', sans-serif; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; transition: all 0.4s;
+  }
   .status-pill.playing { background: var(--accent-glow); color: var(--accent-light); border: 1px solid rgba(162,155,254,0.2); }
   .status-pill.paused { background: var(--bg-elevated); color: var(--text-dim); border: 1px solid var(--border); }
-  .progress-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--bg-elevated); z-index: 30; }
+  .status-pill.autohide { opacity: 0; }
+  .progress-track {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--bg-elevated); z-index: 30;
+    transition: opacity 0.4s;
+  }
+  .progress-track.autohide { opacity: 0; }
   .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%); width: 0%; transition: width 0.3s; border-radius: 0 2px 2px 0; }
-  .hint { position: fixed; top: 16px; left: 16px; z-index: 30; font-size: 11px; color: var(--text-muted); font-family: 'Outfit', sans-serif; font-weight: 400; opacity: 0.8; }
+  .hint {
+    position: fixed; top: 16px; left: 16px; z-index: 30; font-size: 11px; color: var(--text-muted);
+    font-family: 'Outfit', sans-serif; font-weight: 400; opacity: 0.8; transition: opacity 0.4s;
+  }
 </style>
 </head>
 <body>
@@ -143,15 +159,15 @@
   </div>
 </div>
 <div id="prompter-screen">
-  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
-  <div class="hint" id="hint-text">tap to play / pause</div>
+  <div class="progress-track" id="progress-track"><div class="progress-fill" id="progress"></div></div>
+  <div class="hint" id="hint-text">tap to show controls</div>
   <div class="status-pill paused" id="status">paused</div>
   <div class="mirror-indicator" id="mirror-badge">mirror</div>
   <div class="reading-guide"></div>
   <div class="fade-top"></div>
   <div id="script-display"><div id="script-content"></div></div>
   <div class="fade-bottom"></div>
-  <div class="control-bar">
+  <div class="control-bar" id="control-bar">
     <button class="ctrl-btn btn-secondary" onclick="backToEdit()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
     <button class="ctrl-btn btn-play" id="play-btn" onclick="togglePlay()"><svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
     <button class="ctrl-btn btn-secondary" onclick="resetScroll()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
@@ -163,22 +179,137 @@
   </div>
 </div>
 <script>
-let isPlaying=false,scrollSpeed=30,currentPos=0,animationId=null,lastTimestamp=null,isMirrored=false;
-function toggleMirror(){isMirrored=!isMirrored;const d=document.getElementById('script-display'),b=document.getElementById('mirror-badge'),t=document.getElementById('mirror-btn');if(isMirrored){d.classList.add('mirrored');b.classList.add('active');t.style.background='linear-gradient(135deg, var(--hot) 0%, #e17055 100%)';t.style.borderColor='transparent';t.querySelector('svg').style.fill='#fff'}else{d.classList.remove('mirrored');b.classList.remove('active');t.style.background='var(--bg-elevated)';t.style.borderColor='var(--border)';t.querySelector('svg').style.fill='var(--text-dim)'}}
-function startPrompter(){const t=document.getElementById('script-input').value.trim();if(!t){document.getElementById('script-input').focus();return}document.getElementById('script-content').textContent=t;document.getElementById('edit-screen').classList.add('hidden');document.getElementById('prompter-screen').classList.add('active');currentPos=0;document.getElementById('script-content').style.top='30%';updateProgress();setTimeout(()=>{document.getElementById('hint-text').style.opacity='0'},3000)}
-function backToEdit(){stopScroll();document.getElementById('edit-screen').classList.remove('hidden');document.getElementById('prompter-screen').classList.remove('active');document.getElementById('hint-text').style.opacity='0.8'}
-function togglePlay(){isPlaying?stopScroll():startScroll()}
-function startScroll(){isPlaying=true;lastTimestamp=null;document.getElementById('icon-play').style.display='none';document.getElementById('icon-pause').style.display='block';document.getElementById('status').className='status-pill playing';document.getElementById('status').textContent='playing';animationId=requestAnimationFrame(scrollStep)}
-function stopScroll(){isPlaying=false;document.getElementById('icon-play').style.display='block';document.getElementById('icon-pause').style.display='none';document.getElementById('status').className='status-pill paused';document.getElementById('status').textContent='paused';if(animationId){cancelAnimationFrame(animationId);animationId=null}lastTimestamp=null}
-function scrollStep(ts){if(!isPlaying)return;if(lastTimestamp===null)lastTimestamp=ts;const d=ts-lastTimestamp;lastTimestamp=ts;const px=10+(scrollSpeed-1)*(190/99);currentPos+=(px*d)/1000;const c=document.getElementById('script-content'),mx=c.scrollHeight-window.innerHeight*0.3;if(currentPos>=mx){currentPos=mx;stopScroll()}c.style.top=`calc(30% - ${currentPos}px)`;updateProgress();animationId=requestAnimationFrame(scrollStep)}
-function resetScroll(){stopScroll();currentPos=0;document.getElementById('script-content').style.top='30%';updateProgress()}
-function updateSpeed(v){scrollSpeed=parseInt(v);document.getElementById('speed-val').textContent=v}
-function updateSize(v){document.getElementById('script-content').style.fontSize=v+'px';document.getElementById('size-val').textContent=v}
-function updateProgress(){const c=document.getElementById('script-content'),mx=c.scrollHeight-window.innerHeight*0.3,p=mx>0?Math.min((currentPos/mx)*100,100):0;document.getElementById('progress').style.width=p+'%'}
-document.getElementById('script-display').addEventListener('click',function(){togglePlay()});
-document.addEventListener('keydown',function(e){if(e.target.tagName==='TEXTAREA')return;if(e.code==='Space'){e.preventDefault();togglePlay()}else if(e.code==='ArrowUp'){e.preventDefault();const s=document.getElementById('speed-slider');s.value=Math.min(parseInt(s.value)+5,100);updateSpeed(s.value)}else if(e.code==='ArrowDown'){e.preventDefault();const s=document.getElementById('speed-slider');s.value=Math.max(parseInt(s.value)-5,1);updateSpeed(s.value)}else if(e.code==='KeyR'){resetScroll()}else if(e.code==='KeyM'){toggleMirror()}else if(e.code==='Escape'){backToEdit()}});
-document.body.addEventListener('touchmove',function(e){if(document.getElementById('prompter-screen').classList.contains('active'))e.preventDefault()},{passive:false});
-function loadSample(){document.getElementById('script-input').value=`안녕하세요 여러분, 오늘은 밴드 소셜 광고 성과를 분석해보겠습니다.\n\n먼저 3월 한 달간의 전체 캠페인 성과를 살펴보면, 총 6개 캠페인에서 약 1,500만 원의 광고비를 집행했습니다.\n\n전체 노출수는 약 3,200만 회, 가입 전환율은 평균 1.69%를 기록했는데요.\n\n캠페인별로 보면 산지농수산이 가장 높은 전환율을 보였고, 우리동네농산물은 CPA가 가장 낮아 효율이 좋았습니다.\n\n다음 영상에서는 각 캠페인의 소재별 성과를 더 자세히 분석해보겠습니다.\n\n구독과 좋아요 부탁드립니다. 감사합니다!`}
+let isPlaying=false, scrollSpeed=30, currentPos=0, animationId=null, lastTimestamp=null, isMirrored=false;
+let hideTimer=null, uiVisible=true;
+
+function showUI() {
+  uiVisible = true;
+  document.getElementById('control-bar').classList.remove('autohide');
+  document.getElementById('status').classList.remove('autohide');
+  document.getElementById('progress-track').classList.remove('autohide');
+  clearTimeout(hideTimer);
+  if (isPlaying) {
+    hideTimer = setTimeout(hideUI, 3000);
+  }
+}
+
+function hideUI() {
+  if (!isPlaying) return;
+  uiVisible = false;
+  document.getElementById('control-bar').classList.add('autohide');
+  document.getElementById('status').classList.add('autohide');
+  document.getElementById('progress-track').classList.add('autohide');
+}
+
+function toggleMirror() {
+  isMirrored = !isMirrored;
+  const d = document.getElementById('script-display'), b = document.getElementById('mirror-badge'), t = document.getElementById('mirror-btn');
+  if (isMirrored) {
+    d.classList.add('mirrored'); b.classList.add('active');
+    t.style.background = 'linear-gradient(135deg, var(--hot) 0%, #e17055 100%)';
+    t.style.borderColor = 'transparent'; t.querySelector('svg').style.fill = '#fff';
+  } else {
+    d.classList.remove('mirrored'); b.classList.remove('active');
+    t.style.background = 'var(--bg-elevated)';
+    t.style.borderColor = 'var(--border)'; t.querySelector('svg').style.fill = 'var(--text-dim)';
+  }
+  showUI();
+}
+
+function startPrompter() {
+  const t = document.getElementById('script-input').value.trim();
+  if (!t) { document.getElementById('script-input').focus(); return; }
+  document.getElementById('script-content').textContent = t;
+  document.getElementById('edit-screen').classList.add('hidden');
+  document.getElementById('prompter-screen').classList.add('active');
+  currentPos = 0;
+  document.getElementById('script-content').style.top = '30%';
+  updateProgress();
+  showUI();
+  setTimeout(() => { document.getElementById('hint-text').style.opacity = '0'; }, 3000);
+}
+
+function backToEdit() {
+  stopScroll();
+  document.getElementById('edit-screen').classList.remove('hidden');
+  document.getElementById('prompter-screen').classList.remove('active');
+  document.getElementById('hint-text').style.opacity = '0.8';
+  showUI();
+}
+
+function togglePlay() { isPlaying ? stopScroll() : startScroll(); }
+
+function startScroll() {
+  isPlaying = true; lastTimestamp = null;
+  document.getElementById('icon-play').style.display = 'none';
+  document.getElementById('icon-pause').style.display = 'block';
+  document.getElementById('status').className = 'status-pill playing';
+  document.getElementById('status').textContent = 'playing';
+  animationId = requestAnimationFrame(scrollStep);
+  hideTimer = setTimeout(hideUI, 2000);
+}
+
+function stopScroll() {
+  isPlaying = false;
+  document.getElementById('icon-play').style.display = 'block';
+  document.getElementById('icon-pause').style.display = 'none';
+  document.getElementById('status').className = 'status-pill paused';
+  document.getElementById('status').textContent = 'paused';
+  if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+  lastTimestamp = null;
+  clearTimeout(hideTimer);
+  showUI();
+}
+
+function scrollStep(ts) {
+  if (!isPlaying) return;
+  if (lastTimestamp === null) lastTimestamp = ts;
+  const d = ts - lastTimestamp; lastTimestamp = ts;
+  const px = 10 + (scrollSpeed - 1) * (190 / 99);
+  currentPos += (px * d) / 1000;
+  const c = document.getElementById('script-content'), mx = c.scrollHeight - window.innerHeight * 0.3;
+  if (currentPos >= mx) { currentPos = mx; stopScroll(); }
+  c.style.top = `calc(30% - ${currentPos}px)`;
+  updateProgress();
+  animationId = requestAnimationFrame(scrollStep);
+}
+
+function resetScroll() { stopScroll(); currentPos = 0; document.getElementById('script-content').style.top = '30%'; updateProgress(); }
+function updateSpeed(v) { scrollSpeed = parseInt(v); document.getElementById('speed-val').textContent = v; showUI(); }
+function updateSize(v) { document.getElementById('script-content').style.fontSize = v + 'px'; document.getElementById('size-val').textContent = v; showUI(); }
+function updateProgress() { const c = document.getElementById('script-content'), mx = c.scrollHeight - window.innerHeight * 0.3, p = mx > 0 ? Math.min((currentPos / mx) * 100, 100) : 0; document.getElementById('progress').style.width = p + '%'; }
+
+// Tap on script area: if UI hidden -> show UI, if UI visible -> toggle play
+document.getElementById('script-display').addEventListener('click', function(e) {
+  if (!uiVisible) {
+    showUI();
+  } else {
+    togglePlay();
+  }
+});
+
+// Prevent scroll on body but allow touch on control bar and sliders
+document.body.addEventListener('touchmove', function(e) {
+  if (!document.getElementById('prompter-screen').classList.contains('active')) return;
+  const controlBar = document.getElementById('control-bar');
+  if (controlBar.contains(e.target)) return;
+  e.preventDefault();
+}, { passive: false });
+
+// Keyboard
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'TEXTAREA') return;
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.code === 'ArrowUp') { e.preventDefault(); const s = document.getElementById('speed-slider'); s.value = Math.min(parseInt(s.value) + 5, 100); updateSpeed(s.value); }
+  else if (e.code === 'ArrowDown') { e.preventDefault(); const s = document.getElementById('speed-slider'); s.value = Math.max(parseInt(s.value) - 5, 1); updateSpeed(s.value); }
+  else if (e.code === 'KeyR') { resetScroll(); }
+  else if (e.code === 'KeyM') { toggleMirror(); }
+  else if (e.code === 'Escape') { backToEdit(); }
+});
+
+function loadSample() {
+  document.getElementById('script-input').value = `안녕하세요 여러분, 오늘은 밴드 소셜 광고 성과를 분석해보겠습니다.\n\n먼저 3월 한 달간의 전체 캠페인 성과를 살펴보면, 총 6개 캠페인에서 약 1,500만 원의 광고비를 집행했습니다.\n\n전체 노출수는 약 3,200만 회, 가입 전환율은 평균 1.69%를 기록했는데요.\n\n캠페인별로 보면 산지농수산이 가장 높은 전환율을 보였고, 우리동네농산물은 CPA가 가장 낮아 효율이 좋았습니다.\n\n다음 영상에서는 각 캠페인의 소재별 성과를 더 자세히 분석해보겠습니다.\n\n구독과 좋아요 부탁드립니다. 감사합니다!`;
+}
 </script>
 </body>
 </html>
