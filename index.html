@@ -86,7 +86,12 @@
     font-weight: 300; color: var(--text); white-space: pre-wrap; word-break: keep-all;
     transition: top 0.05s linear; padding-bottom: 70vh;
   }
-  #script-display.mirrored #script-content { transform: rotate(180deg); }
+
+  /* Mirror/Prompter mode: rotate script area + guide + fades, but NOT control bar */
+  #prompter-screen.mirrored .prompter-content { transform: rotate(180deg); }
+  #prompter-screen.mirrored .reading-guide { top: auto; bottom: 30%; }
+  #prompter-screen.mirrored .fade-top { top: auto; bottom: 0; background: linear-gradient(to top, var(--bg) 0%, transparent 100%); }
+  #prompter-screen.mirrored .fade-bottom { bottom: auto; top: 0; background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%); }
   .mirror-indicator {
     position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 30;
     padding: 5px 14px; border-radius: 8px; font-size: 11px; font-family: 'Outfit', sans-serif;
@@ -104,9 +109,6 @@
     touch-action: auto;
   }
   .control-bar.autohide { opacity: 0; transform: translateY(20px); pointer-events: none; }
-
-  /* Prompter mode: rotate entire screen 180deg */
-  #prompter-screen.flipped { transform: rotate(180deg); }
   .ctrl-btn {
     width: 48px; height: 48px; border-radius: 12px; border: none;
     display: flex; align-items: center; justify-content: center;
@@ -166,16 +168,17 @@
   <div class="hint" id="hint-text">tap to show controls</div>
   <div class="status-pill paused" id="status">paused</div>
   <div class="mirror-indicator" id="mirror-badge">mirror</div>
-  <div class="reading-guide"></div>
-  <div class="fade-top"></div>
-  <div id="script-display"><div id="script-content"></div></div>
-  <div class="fade-bottom"></div>
+  <div class="prompter-content" style="flex:1;position:relative;overflow:hidden;">
+    <div class="reading-guide"></div>
+    <div class="fade-top"></div>
+    <div id="script-display"><div id="script-content"></div></div>
+    <div class="fade-bottom"></div>
+  </div>
   <div class="control-bar" id="control-bar">
     <button class="ctrl-btn btn-secondary" onclick="backToEdit()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
     <button class="ctrl-btn btn-play" id="play-btn" onclick="togglePlay()"><svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
     <button class="ctrl-btn btn-secondary" onclick="resetScroll()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
     <button class="ctrl-btn btn-secondary" id="mirror-btn" onclick="toggleMirror()"><svg viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg></button>
-    <button class="ctrl-btn btn-secondary" id="flip-btn" onclick="toggleFlip()" title="프롬프터 모드"><svg viewBox="0 0 24 24"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/></svg></button>
     <div class="slider-group">
       <div class="slider-row"><span class="slider-label">spd</span><input type="range" id="speed-slider" min="1" max="100" value="30" oninput="updateSpeed(this.value)"><span class="slider-value" id="speed-val">30</span></div>
       <div class="slider-row"><span class="slider-label">size</span><input type="range" id="size-slider" min="24" max="72" value="36" oninput="updateSize(this.value)"><span class="slider-value" id="size-val">36</span></div>
@@ -184,25 +187,7 @@
 </div>
 <script>
 let isPlaying=false, scrollSpeed=30, currentPos=0, animationId=null, lastTimestamp=null, isMirrored=false;
-let hideTimer=null, uiVisible=true, isFlipped=false;
-
-function toggleFlip() {
-  isFlipped = !isFlipped;
-  const screen = document.getElementById('prompter-screen');
-  const btn = document.getElementById('flip-btn');
-  if (isFlipped) {
-    screen.classList.add('flipped');
-    btn.style.background = 'linear-gradient(135deg, var(--mint) 0%, #00b894 100%)';
-    btn.style.borderColor = 'transparent';
-    btn.querySelector('svg').querySelector('path').style.fill = '#fff';
-  } else {
-    screen.classList.remove('flipped');
-    btn.style.background = 'var(--bg-elevated)';
-    btn.style.borderColor = 'var(--border)';
-    btn.querySelector('svg').querySelector('path').style.fill = 'var(--text-dim)';
-  }
-  showUI();
-}
+let hideTimer=null, uiVisible=true;
 
 function showUI() {
   uiVisible = true;
@@ -225,13 +210,13 @@ function hideUI() {
 
 function toggleMirror() {
   isMirrored = !isMirrored;
-  const d = document.getElementById('script-display'), b = document.getElementById('mirror-badge'), t = document.getElementById('mirror-btn');
+  const screen = document.getElementById('prompter-screen'), b = document.getElementById('mirror-badge'), t = document.getElementById('mirror-btn');
   if (isMirrored) {
-    d.classList.add('mirrored'); b.classList.add('active');
+    screen.classList.add('mirrored'); b.classList.add('active');
     t.style.background = 'linear-gradient(135deg, var(--hot) 0%, #e17055 100%)';
     t.style.borderColor = 'transparent'; t.querySelector('svg').style.fill = '#fff';
   } else {
-    d.classList.remove('mirrored'); b.classList.remove('active');
+    screen.classList.remove('mirrored'); b.classList.remove('active');
     t.style.background = 'var(--bg-elevated)';
     t.style.borderColor = 'var(--border)'; t.querySelector('svg').style.fill = 'var(--text-dim)';
   }
