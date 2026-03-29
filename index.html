@@ -95,7 +95,7 @@
   }
   .mirror-indicator.active { display: block; }
 
-  /* CONTROL BAR - auto hide + top/bottom toggle */
+  /* CONTROL BAR - auto hide */
   .control-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: linear-gradient(to top, var(--bg) 80%, transparent);
@@ -103,13 +103,10 @@
     transition: opacity 0.4s, transform 0.4s;
     touch-action: auto;
   }
-  .control-bar.top {
-    bottom: auto; top: 0;
-    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
-    padding: 28px 20px 12px;
-  }
   .control-bar.autohide { opacity: 0; transform: translateY(20px); pointer-events: none; }
-  .control-bar.top.autohide { transform: translateY(-20px); }
+
+  /* Prompter mode: rotate entire screen 180deg */
+  #prompter-screen.flipped { transform: rotate(180deg); }
   .ctrl-btn {
     width: 48px; height: 48px; border-radius: 12px; border: none;
     display: flex; align-items: center; justify-content: center;
@@ -178,7 +175,7 @@
     <button class="ctrl-btn btn-play" id="play-btn" onclick="togglePlay()"><svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
     <button class="ctrl-btn btn-secondary" onclick="resetScroll()"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
     <button class="ctrl-btn btn-secondary" id="mirror-btn" onclick="toggleMirror()"><svg viewBox="0 0 24 24"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg></button>
-    <button class="ctrl-btn btn-secondary" id="pos-btn" onclick="togglePosition()" title="컨트롤 위치 전환"><svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg></button>
+    <button class="ctrl-btn btn-secondary" id="flip-btn" onclick="toggleFlip()" title="프롬프터 모드"><svg viewBox="0 0 24 24"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/></svg></button>
     <div class="slider-group">
       <div class="slider-row"><span class="slider-label">spd</span><input type="range" id="speed-slider" min="1" max="100" value="30" oninput="updateSpeed(this.value)"><span class="slider-value" id="speed-val">30</span></div>
       <div class="slider-row"><span class="slider-label">size</span><input type="range" id="size-slider" min="24" max="72" value="36" oninput="updateSize(this.value)"><span class="slider-value" id="size-val">36</span></div>
@@ -187,25 +184,22 @@
 </div>
 <script>
 let isPlaying=false, scrollSpeed=30, currentPos=0, animationId=null, lastTimestamp=null, isMirrored=false;
-let hideTimer=null, uiVisible=true, controlsOnTop=false;
+let hideTimer=null, uiVisible=true, isFlipped=false;
 
-function togglePosition() {
-  controlsOnTop = !controlsOnTop;
-  const bar = document.getElementById('control-bar');
-  const btn = document.getElementById('pos-btn');
-  const svg = btn.querySelector('svg');
-  if (controlsOnTop) {
-    bar.classList.add('top');
-    svg.innerHTML = '<path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>';
+function toggleFlip() {
+  isFlipped = !isFlipped;
+  const screen = document.getElementById('prompter-screen');
+  const btn = document.getElementById('flip-btn');
+  if (isFlipped) {
+    screen.classList.add('flipped');
     btn.style.background = 'linear-gradient(135deg, var(--mint) 0%, #00b894 100%)';
     btn.style.borderColor = 'transparent';
-    svg.querySelector('path').style.fill = '#fff';
+    btn.querySelector('svg').querySelector('path').style.fill = '#fff';
   } else {
-    bar.classList.remove('top');
-    svg.innerHTML = '<path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/>';
+    screen.classList.remove('flipped');
     btn.style.background = 'var(--bg-elevated)';
     btn.style.borderColor = 'var(--border)';
-    svg.querySelector('path').style.fill = 'var(--text-dim)';
+    btn.querySelector('svg').querySelector('path').style.fill = 'var(--text-dim)';
   }
   showUI();
 }
